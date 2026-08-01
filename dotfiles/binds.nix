@@ -13,14 +13,16 @@
 
 
       "$mainMod, Q, exec, $terminal"
-      "$mainMod, E, exec, $explorer"
+      "$mainMod, E, exec, $explorer --new-window"
       "$mainMod, T, exec, missioncenter"
       "$mainMod, S, exec, steam"
       "$mainMod, Z, exec, zeditor"
       "$mainMod, O, exec, obsidian"
+      "$mainMod, G, exec, lutris"
       "$mainMod, V, exec, clipsy"
 
       "ALT, 1, exec, firefox"
+      "ALT, 2, exec, flclash"
 
 
 
@@ -65,11 +67,22 @@
     ];
 
     bindel = [
-      ",XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-      ",XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-      ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-      ",XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-      ",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+      ",XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
+      ",XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
+
+      ",XF86MonBrightnessUp, exec, swayosd-client --brightness raise"
+      ",XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
+
+      ",XF86AudioPlay, exec, playerctl play-pause && swayosd-client --play-pause"
+      ",XF86AudioPause, exec, playerctl play-pause && swayosd-client --play-pause"
+      ",XF86AudioNext, exec, playerctl next && swayosd-client --skip-next"
+      ",XF86AudioPrev, exec, playerctl previous && swayosd-client --skip-prev"
     ];
+
+    bindl = [
+      ",XF86AudioMute, exec, swayosd-client --output-volume mute-toggle"
+      ",XF86AudioMicMute, exec, swayosd-client --default-source mute-toggle"
+    ];
+
   };
 }

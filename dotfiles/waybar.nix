@@ -1,95 +1,111 @@
 { pkgs, ... }:
 
-let
-  powerStatus = pkgs.writeShellScriptBin "power-profile-status" ''
-    profile=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl get)
-    case "$profile" in
-      power-saver)  icon="🌙"; text="Эко";    ;;
-      balanced)     icon="⚖"; text="Баланс";  ;;
-      performance)  icon="🚀"; text="Турбо";   ;;
-      *)            icon="?"; text="$profile" ;;
-    esac
-    echo "{\"text\":\"$icon $text\",\"tooltip\":\"Режим питания: $profile\nКлик — переключить\",\"class\":\"$profile\"}"
-  '';
-
-  powerToggle = pkgs.writeShellScriptBin "power-profile-toggle" ''
-    current=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl get)
-    case "$current" in
-      power-saver) next="balanced" ;;
-      balanced)    next="performance" ;;
-      performance) next="power-saver" ;;
-      *)           next="balanced" ;;
-    esac
-    ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set "$next"
-  '';
-in
 {
-  home.packages = [ powerStatus powerToggle ];
-
   programs.waybar = {
     enable = true;
-
     settings = {
       mainBar = {
         layer = "top";
         position = "top";
-        height = 36;
-        spacing = 4;
-        modules-left = [ "hyprland/workspaces" "hyprland/submap" ];
+        # Отступы для эффекта "парения"
+        margin = "10 20 0 20";
+        spacing = 10;
+
+        modules-left = [ "hyprland/workspaces" "hyprland/window" ];
         modules-center = [ "clock" ];
-        modules-right = [ "idle_inhibitor" "cpu" "memory" "custom/power" "pulseaudio" "network" "backlight" "battery" "tray" ];
+        # Убрали custom/lock из правой части
+        modules-right = [
+          "idle_inhibitor"
+          "power-profiles-daemon"
+          "backlight"
+          "network"
+          "pulseaudio"
+          "battery"
+          "tray"
+        ];
 
         "hyprland/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          active-only = false;
+          format = "{icon}";
           on-click = "activate";
-          format = "{name}";
+          format-icons = {
+            active = "";
+            default = "";
+            empty = "";
+          };
+          persistent-workspaces = {
+            "*" = 4;
+          };
         };
 
-        "tray" = {
-          icon-size = 18;
-          spacing = 10;
+        "hyprland/window" = {
+          # Отображаем имя приложения (класс), а не имя файла/вкладки
+          format = "{class}";
+          max-length = 50;
+          rewrite = {
+            "" = "Hyprland";          # Если окна нет
+            "kitty" = "Kitty";
+            "firefox-nightly" = "Firefox";
+            "firefox" = "Firefox";
+            "dev.zed.Zed" = "Zed Editor";
+            "org.gnome.Nautilus" = "Nautilus";
+            "com.follow.clash" = "FlClash";
+            "net.lutris.Lutris" = "Lutris";
+          };
         };
 
         "clock" = {
-          timezone = "Asia/Krasnoyarsk";
-          format = "  {:%H:%M  |    %e %b}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          # Время без значка часов
+          format = "{:%H:%M}";
+          format-alt = "  {:%A, %d %B}";
+          tooltip-format = "<tt><small>{calendar}</small></tt>";
         };
 
+        # ☕ Модуль запрета сна (кофе)
         "idle_inhibitor" = {
           format = "{icon}";
           format-icons = {
-            activated = "";
-            deactivated = "";
+            activated = "";
+            deactivated = "";
           };
-          tooltip-format-activated = "Сон запрещён — клик, чтобы разрешить";
-          tooltip-format-deactivated = "Сон разрешён — клик, чтобы запретить";
+          tooltip-format-activated = "Сон отключен";
+          tooltip-format-deactivated = "Обычный режим сна";
         };
 
-        "cpu" = {
-          interval = 5;
-          format = " {usage}%";
-          tooltip = false;
+        #  Модуль профилей питания
+        "power-profiles-daemon" = {
+          format = "{icon}";
+          tooltip-format = "Профиль: {profile}\nДрайвер: {driver}";
+          tooltip = true;
+          format-icons = {
+            default = "";
+            performance = "";
+            balanced = "";
+            power-saver = "";
+          };
         };
 
-        "memory" = {
-          interval = 5;
-          format = " {percentage}%";
-          tooltip-format = "{used:0.1f}G / {total:0.1f}G";
-        };
-
-        "custom/power" = {
-          exec = "power-profile-status";
-          interval = 5;
-          return-type = "json";
-          on-click = "power-profile-toggle";
-        };
-
+        # 󰃠 Модуль яркости экрана
         "backlight" = {
-          format = "{icon} {percent}%";
-          format-icons = [ "" "" "" "" "" "" "" "" "" ];
+          format = "{icon}  {percent}%";
+          format-icons = ["󰃞" "󰃟" "󰃠"];
+          on-scroll-up = "brightnessctl set 1%+";
+          on-scroll-down = "brightnessctl set 1%-";
+        };
+
+        "network" = {
+          format-wifi = "  {essid}";
+          format-ethernet = "󰈀  Wired";
+          format-disconnected = "󰤭  Offline";
+          tooltip-format = "{ipaddr}/{cidr}";
+        };
+
+        "pulseaudio" = {
+          format = "{icon}  {volume}%";
+          format-muted = "󰖁  Muted";
+          format-icons = {
+            default = ["" "" ""];
+          };
+          on-click = "pavucontrol";
         };
 
         "battery" = {
@@ -97,137 +113,100 @@ in
             warning = 30;
             critical = 15;
           };
-          format = "{icon} {capacity}%";
-          format-charging = " {capacity}%";
-          format-plugged = " {capacity}%";
-          format-alt = "{icon} {time}";
-          format-icons = [ "" "" "" "" "" ];
+          format = "{icon}  {capacity}%";
+          format-charging = "󰂄  {capacity}%";
+          format-plugged = "  {capacity}%";
+          format-icons = ["" "" "" "" ""];
         };
 
-        "network" = {
-          format-wifi = "  {essid}";
-          format-ethernet = "  {ipaddr}/{cidr}";
-          format-disconnected = "Disconnected ⚠";
-          tooltip-format = "{ifname} via {gwaddr} ";
-        };
-
-        "pulseaudio" = {
-          format = "{icon} {volume}%";
-          format-bluetooth = "{icon} {volume}% {format_source}";
-          format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = " {format_source}";
-          format-icons = {
-            headphone = "";
-            hands-free = "";
-            headset = "";
-            phone = "";
-            portable = "";
-            car = "";
-            default = [ "" "" "" ];
-          };
-          on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        "tray" = {
+          icon-size = 18;
+          spacing = 10;
         };
       };
     };
 
     style = ''
+      /* === Палитра Rosé Pine === */
+      @define-color base #191724;
+      @define-color surface #1f1d2e;
+      @define-color overlay #26233a;
+      @define-color muted #6e6a86;
+      @define-color text #e0def4;
+      @define-color love #eb6f92;
+      @define-color gold #f6c177;
+      @define-color rose #ebbcba;
+      @define-color pine #31748f;
+      @define-color foam #9ccfd8;
+      @define-color iris #c4a7e7;
+
       * {
-          font-family: "JetBrainsMono Nerd Font", Roboto, Helvetica, Arial, sans-serif;
-          font-size: 13px;
-          font-weight: bold;
+        font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 0;
+        min-height: 0;
       }
 
       window#waybar {
-          background-color: rgba(35, 33, 54, 0.85);
-          border-bottom: 2px solid rgba(156, 207, 216, 0.2);
-          color: #e0def4;
-          transition-property: background-color;
-          transition-duration: .5s;
+        background-color: transparent;
+        color: @text;
+      }
+
+      .modules-left, .modules-center, .modules-right {
+        background-color: @base;
+        border-radius: 20px;
+        padding: 4px 12px;
+        border: 2px solid @surface;
       }
 
       #workspaces button {
-          padding: 0 5px;
-          background-color: transparent;
-          color: #6e6a86;
-          border-bottom: 3px solid transparent;
-          transition: all 0.3s ease-in-out;
+        color: @muted;
+        padding: 0 6px;
+        background: transparent;
+        transition: color 0.2s ease;
       }
-
-      #workspaces button:hover {
-          background: rgba(0, 0, 0, 0.2);
-          box-shadow: inherit;
-          border-bottom: 3px solid #9ccfd8;
-          color: #9ccfd8;
-      }
-
       #workspaces button.active {
-          color: #c4a7e7;
-          border-bottom: 3px solid #c4a7e7;
+        color: @rose;
+      }
+      #workspaces button:hover {
+        box-shadow: inherit;
+        text-shadow: inherit;
+        color: @iris;
       }
 
-      #clock, #battery, #backlight, #network, #pulseaudio, #tray,
-      #cpu, #memory, #idle_inhibitor, #custom-power {
-          padding: 0 14px;
-          margin: 4px 2px;
-          color: #e0def4;
-          background-color: rgba(42, 39, 63, 0.6);
-          border-radius: 8px;
-          transition: background-color 0.3s ease-in-out;
+      #clock, #battery, #pulseaudio, #network, #tray, #window,
+      #idle_inhibitor, #power-profiles-daemon, #backlight {
+        padding: 4px 10px;
+        color: @text;
       }
 
-      #clock, #battery, #backlight, #network, #pulseaudio, #tray,
-      #cpu, #memory, #idle_inhibitor, #custom-power {
-      }
+      /* === Раскраска === */
+      #clock { color: @text; }
+      #backlight { color: @gold; }
+      #power-profiles-daemon { color: @pine; }
 
-      #clock:hover, #battery:hover, #backlight:hover, #network:hover,
-      #pulseaudio:hover, #cpu:hover, #memory:hover, #idle_inhibitor:hover,
-      #custom-power:hover {
-          background-color: rgba(42, 39, 63, 0.9);
-      }
+      #idle_inhibitor.activated { color: @rose; }
+      #idle_inhibitor.deactivated { color: @muted; }
 
-      #clock {
-          color: #f6c177;
-          background-color: transparent;
-          font-size: 14px;
-      }
+      #pulseaudio { color: @iris; }
+      #network { color: @foam; }
 
-      #pulseaudio { color: #9ccfd8; }
-      #network { color: #3e8fb0; }
-      #backlight { color: #f6c177; }
-      #battery { color: #eb6f92; }
-      #cpu { color: #3e8fb0; }
-      #memory { color: #c4a7e7; }
-      #idle_inhibitor { color: #9ccfd8; }
-
-      #idle_inhibitor.activated {
-          color: #f6c177;
-          background-color: rgba(246, 193, 119, 0.15);
-      }
-
-      #custom-power.power-saver  { color: #9ccfd8; }
-      #custom-power.balanced     { color: #f6c177; }
-      #custom-power.performance  { color: #eb6f92; }
-
-      #battery.charging, #battery.plugged {
-          color: #9ccfd8;
-          background-color: rgba(42, 39, 63, 0.8);
-      }
-
+      #battery { color: @pine; }
+      #battery.charging, #battery.plugged { color: @rose; }
+      #battery.warning:not(.charging) { color: @gold; }
       #battery.critical:not(.charging) {
-          background-color: #f38ba8;
-          color: #11111b;
-          animation-name: blink;
-          animation-duration: 0.5s;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
+        color: @love;
+        animation-name: blink;
+        animation-duration: 0.5s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
       }
 
       @keyframes blink {
-          to {
-              background-color: #ffffff;
-              color: #000000;
-          }
+        to { color: @text; }
       }
     '';
   };

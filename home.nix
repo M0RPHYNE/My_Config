@@ -12,6 +12,8 @@
     ./dotfiles/hyprlock.nix
     ./dotfiles/waybar.nix
     ./dotfiles/fastfetch.nix
+    ./dotfiles/hyprpaper.nix
+    ./dotfiles/nautilus.nix
   ];
 
   home.username = "morphyne";
@@ -23,6 +25,8 @@
   ##############################################################
   home.packages = with pkgs; [
     (pkgs.callPackage /home/morphyne/Documents/clipsy { })
+    (pkgs.writeShellScriptBin "firefox" ''exec /home/morphyne/Applications/FirefoxNightly/firefox "$@"'')
+    (pkgs.writeShellScriptBin "flclash" ''exec /home/morphyne/Applications/FlClash/FlClash "$@"'')
     nautilus
     wofi
     libnotify
@@ -31,21 +35,13 @@
     grim
     slurp
     wl-clipboard
-    firefox
-    discord
     obsidian
     krita
     imv
     mpv
     nixd
     zed-editor
-
   ];
-
-  ##############################################################
-  # Polkit-агент
-  ##############################################################
-  services.hyprpolkitagent.enable = true;
 
   ##############################################################
   # MangoHud
@@ -65,6 +61,56 @@
   };
 
   ##############################################################
+  # SwayOSD и стили
+  ##############################################################
+  services.swayosd = {
+    enable = true;
+    topMargin = 0.85;  # 0.0 = у самого верха, 0.5 = центр экрана
+    stylePath = "${config.xdg.configHome}/swayosd/style.css";
+  };
+
+  xdg.configFile."swayosd/style.css".text = ''
+    window#osd {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(30, 30, 46, 0.95);
+    }
+
+    window#osd #container {
+      margin: 16px;
+    }
+
+    window#osd image,
+    window#osd label {
+      color: #e0def4;
+    }
+
+    window#osd progressbar,
+    window#osd segmentedprogress {
+      min-height: 6px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+    }
+
+    window#osd trough,
+    window#osd segment {
+      min-height: inherit;
+      border-radius: inherit;
+      border: none;
+      background-color: rgba(224, 222, 244, 0.15);
+    }
+
+    window#osd progress,
+    window#osd segment.active {
+      min-height: inherit;
+      border-radius: inherit;
+      border: none;
+      background-color: #9ccfd8;
+    }
+  '';
+
+  ##############################################################
   # Переменные окружения сессии
   ##############################################################
   home.sessionVariables = {
@@ -73,4 +119,5 @@
   };
 
   programs.home-manager.enable = true;
+  services.playerctld.enable = true;
 }

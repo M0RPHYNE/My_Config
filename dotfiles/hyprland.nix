@@ -14,7 +14,8 @@
       "$explorer" = "nautilus";
 
       "exec-once" = [
-        "sleep 1 && hyprlock"
+        "waypaper --restore"
+        "sleep 2 && hyprlock"
         "blueman-applet"
         "nm-applet --indicator"
         "waybar"

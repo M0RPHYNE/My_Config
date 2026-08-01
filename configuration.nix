@@ -5,7 +5,6 @@
     ./hardware-configuration.nix
     <home-manager/nixos>
   ];
-
   ##############################################################
   # Загрузчик и ядро
   ##############################################################
@@ -13,10 +12,15 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.configurationLimit = 1;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelModules = [ "mt7921e" ];
+  boot.kernelModules = [
+    "mt7921e"
+    "tun"
+  ];
 
   nixpkgs.config.allowUnfree = true;
   hardware.enableAllFirmware = true;
+
+  networking.firewall.enable = false;
 
   ##############################################################
   # Сессия — автологин в tty + запуск через UWSM
@@ -37,6 +41,20 @@
   };
 
   security.pam.services.hyprlock = {};   # без этого hyprlock не сможет проверять пароль
+
+  systemd.user.services.polkit-gnome-authentication-agent-1 = {
+      description = "polkit-gnome-authentication-agent-1";
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+        RestartSec = 1;
+        TimeoutStopSec = 10;
+      };
+    };
 
   ##############################################################
   # Оборудование — Bluetooth, графика, звук
@@ -126,6 +144,7 @@
   ##############################################################
   # Системные пакеты
   ##############################################################
+
   environment.systemPackages = with pkgs; [
     wget
     git
@@ -144,8 +163,16 @@
     btop
     mission-center
     lm_sensors
-
+    pavucontrol
+    polkit_gnome
+    waypaper
+    mpvpaper
   ];
+
+  ##############################################################
+  # dconf — нужен для тем GTK/иконок/курсора и настроек Nautilus
+  ##############################################################
+  programs.dconf.enable = true;
 
   ##############################################################
   # Steam / игры / совместимость бинарников
@@ -188,6 +215,19 @@
     libxshmfence
     udev
     libgbm
+    libepoxy
+    libayatana-appindicator
+    keybinder3
+    harfbuzz
+    gdk-pixbuf
+    libayatana-indicator
+    ayatana-ido
+    libdbusmenu
+    ffmpeg
+    libpulseaudio
+    wayland
+    dconf
+    libglvnd
   ];
 
   system.stateVersion = "25.11"; # Did you read the comment?

@@ -17,54 +17,68 @@
           path = "screenshot";
           blur_passes = 3;
           blur_size = 8;
-          noise = 0.02;
-          contrast = 0.9;
-          brightness = 0.7;
+          noise = 0.0117;
+          contrast = 0.8916;
+          brightness = 0.8;
+          vibrancy = 0.1696;
+          vibrancy_darkness = 0.0;
         }
       ];
 
-      # Поле для ввода пароля
+      # === Поле для ввода пароля ===
       input-field = [
         {
-          size = "300, 60";
-          position = "0, -20";
+          size = "280, 60";
+          position = "0, -70";
           halign = "center";
           valign = "center";
 
-          outer_color = "rgb(9ccfd8)";
-          inner_color = "rgb(2a273f)";
-          font_color = "rgb(e0def4)";
+          # Цвета Rosé Pine
+          outer_color = "rgb(31748f)"; # pine
+          inner_color = "rgb(1f1d2e)"; # surface
+          font_color = "rgb(e0def4)";  # text
 
-          rounding = 16;
+          # Цвета состояний
+          check_color = "rgb(f6c177)"; # gold
+          fail_color = "rgb(eb6f92)";  # love
+
+          rounding = 20;
           outline_thickness = 2;
-          placeholder_text = "Пароль...";
-          fade_on_empty = false;
 
-          check_color = "rgb(9ccfd8)";
-          fail_color = "rgb(eb6f92)";
+          # Строгий текст без курсива
+          placeholder_text = "Password";
           fail_text = "Неверный пароль";
+
+          fade_on_empty = false;
+          dots_center = true;
+          shadow_passes = 2;
         }
       ];
 
-      # Часы
+      # === Текстовые элементы ===
       label = [
+        # 1. Часы
         {
-          text = "cmd[update:1000] echo \"$(date +'%H:%M')\"";
-          font_size = 90;
+          text = "cmd[update:1000] echo \"<b>$(date +'%H:%M')</b>\"";
+          font_size = 110;
           font_family = "JetBrainsMono Nerd Font";
-          color = "rgb(e0def4)";
-          position = "0, 160";
+          color = "rgb(e0def4)"; # text
+          position = "0, 200";
           halign = "center";
           valign = "center";
+          shadow_passes = 3;
+          shadow_size = 4;
         }
+        # 2. Дата
         {
           text = "cmd[update:1000] echo \"$(date +'%A, %d %B')\"";
-          font_size = 20;
+          font_size = 22;
           font_family = "JetBrainsMono Nerd Font";
-          color = "rgb(9ccfd8)";
+          color = "rgb(c4a7e7)"; # iris
           position = "0, 80";
           halign = "center";
           valign = "center";
+          shadow_passes = 1;
         }
       ];
     };
