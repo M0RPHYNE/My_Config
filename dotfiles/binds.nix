@@ -54,10 +54,9 @@
       #Longscrin
       "$mainMod, L, exec, hyprlock"
 
-
       # Скриншоты
-      ", Print, exec, mkdir -p ~/Pictures/Screenshots && grim -g \"$(slurp)\" - | tee ~/Pictures/Screenshots/screenshot-$(date +%F_%T).png | wl-copy && notify-send \"Скриншот сохранён и скопирован\" -i camera-photo"
-      "SHIFT, Print, exec, mkdir -p ~/Pictures/Screenshots && grim - | tee ~/Pictures/Screenshots/screenshot-$(date +%F_%T).png | wl-copy && notify-send \"Полный скриншот сохранён и скопирован\" -i camera-photo"
+      ", Print, exec, mkdir -p ~/Pictures/Screenshots && grimblast --notify copysave area ~/Pictures/Screenshots/screenshot-$(date +%F_%T).png"
+      "SHIFT, Print, exec, mkdir -p ~/Pictures/Screenshots && grimblast --notify copysave screen ~/Pictures/Screenshots/screenshot-$(date +%F_%T).png"
     ];
 
     bindm = [

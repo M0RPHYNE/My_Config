@@ -3,8 +3,7 @@
 {
   services.mako = {
     enable = true;
-    
-    # Современный синтаксис через блок settings
+
     settings = {
       font = "JetBrainsMono Nerd Font 11";
       width = 350;
@@ -16,35 +15,31 @@
       icons = true;
       max-icon-size = 48;
       default-timeout = 5000;
+      ignore-timeout = false;
       layer = "overlay";
       anchor = "top-right";
 
-      # Цветовая схема Rosé Pine Moon (как в твоем оригинале)
-      background-color = "#2a273fd9"; # Прозрачность 85%
+      # группировка одинаковых уведомлений (например спам от Steam/Discord)
+      group-by = "app-name";
+      max-visible = 5;
+      sort = "-time";
+
+      # базовая палитра — используется как fallback для normal/low
+      background-color = "#2a273fd9";
       text-color = "#e0def4";
       border-color = "#9ccfd8cc";
       progress-color = "#9ccfd8";
     };
 
-    # Правила для уровней срочности (они пишутся отдельно)
     extraConfig = ''
       [urgency=low]
-      border-color=#9ccfd8cc
-      background-color=#2a273fd9
-      text-color=#e0def4
-      default-timeout=4000
-
-      [urgency=normal]
-      border-color=#9ccfd8cc
-      background-color=#2a273fd9
-      text-color=#e0def4
-      default-timeout=4000
+      border-color=#6e6a86cc
+      default-timeout=3000
 
       [urgency=critical]
-      border-color=#6e6a86cc
-      background-color=#2a273fd9
-      text-color=#e0def4
-      default-timeout=6000
+      border-color=#eb6f92cc
+      default-timeout=0
+      ignore-timeout=true
     '';
   };
 }

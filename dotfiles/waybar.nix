@@ -46,10 +46,14 @@
             "kitty" = "Kitty";
             "firefox-nightly" = "Firefox";
             "firefox" = "Firefox";
+            "discord" = "Discord";
             "dev.zed.Zed" = "Zed Editor";
             "org.gnome.Nautilus" = "Nautilus";
             "com.follow.clash" = "FlClash";
             "net.lutris.Lutris" = "Lutris";
+            ".blueman-manager-wrapped" = "Bluetooth";
+            "org.telegram.desktop" = "Telegram";
+            "waypaper" = "Waypaper";
           };
         };
 

@@ -12,9 +12,13 @@
     ./dotfiles/hyprlock.nix
     ./dotfiles/waybar.nix
     ./dotfiles/fastfetch.nix
-    ./dotfiles/hyprpaper.nix
     ./dotfiles/nautilus.nix
+    ./dotfiles/battery.nix
   ];
+
+  home.file.".local/share/fonts/AstroSpace.otf".source = ./fonts/AstroSpace.otf;
+  home.file.".local/share/fonts/Nasalization.otf".source = ./fonts/Nasalization.otf;
+  fonts.fontconfig.enable = true;
 
   home.username = "morphyne";
   home.homeDirectory = "/home/morphyne";
@@ -27,13 +31,17 @@
     (pkgs.callPackage /home/morphyne/Documents/clipsy { })
     (pkgs.writeShellScriptBin "firefox" ''exec /home/morphyne/Applications/FirefoxNightly/firefox "$@"'')
     (pkgs.writeShellScriptBin "flclash" ''exec /home/morphyne/Applications/FlClash/FlClash "$@"'')
+    gsettings-desktop-schemas
+    sound-theme-freedesktop
     nautilus
     wofi
     libnotify
     brightnessctl
+    libcanberra-gtk3
     playerctl
     grim
     slurp
+    grimblast
     wl-clipboard
     obsidian
     krita
@@ -41,6 +49,7 @@
     mpv
     nixd
     zed-editor
+    mpvpaper
   ];
 
   ##############################################################
@@ -115,6 +124,7 @@
   ##############################################################
   home.sessionVariables = {
     NIXOS_OZONE_WL = "1";
+    GSETTINGS_SCHEMA_DIR = "${pkgs.gsettings-desktop-schemas}/share/glib-2.0/schemas:${pkgs.gtk3}/share/glib-2.0/schemas";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share";
   };
 

@@ -14,7 +14,7 @@
 
       background = [
         {
-          path = "screenshot";
+          path = "/home/morphyne/Pictures/Wallpaper/home.jpeg";
           blur_passes = 3;
           blur_size = 8;
           noise = 0.0117;
@@ -25,27 +25,42 @@
         }
       ];
 
-      # === Поле для ввода пароля ===
+      shape = [
+        # === Ряд из 5 кружков NASA (первый пустой) ===
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(0,0,0,0)"; position = "1098, -120"; halign = "left"; valign = "top"; }
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(0,0,0,0)"; position = "1242, -120"; halign = "left"; valign = "top"; }
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(0,0,0,0)"; position = "1386, -120"; halign = "left"; valign = "top"; }
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(0,0,0,0)"; position = "1531, -120"; halign = "left"; valign = "top"; }
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(0,0,0,0)"; position = "1675, -120"; halign = "left"; valign = "top"; }
+
+        # === 2x2 кружки снизу слева: диагональ purple(декор)/muted(декор-кнопки) ===
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(196,167,231,0.15)"; position = "0, -699";  halign = "left"; valign = "top"; } # top-left purple, декор
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(6e6a86)"; color = "rgba(0,0,0,0)";           position = "139, -699"; halign = "left"; valign = "top"; } # top-right gray, декор "shutdown"
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(6e6a86)"; color = "rgba(0,0,0,0)";           position = "0, -844";  halign = "left"; valign = "top"; } # bottom-left gray, декор "reboot"
+        { size = "130, 130"; rounding = 65; border_size = 3; border_color = "rgb(c4a7e7)"; color = "rgba(196,167,231,0.15)"; position = "139, -844"; halign = "left"; valign = "top"; } # bottom-right purple, декор
+
+        # === Кружок-иконка внутри поля пароля ===
+        { size = "112, 112"; rounding = 56; border_size = 2; border_color = "rgb(9ccfd8)"; color = "rgba(0,0,0,0)"; position = "1330, -788"; halign = "left"; valign = "top"; }
+      ];
+
       input-field = [
         {
-          size = "280, 60";
-          position = "0, -70";
-          halign = "center";
-          valign = "center";
+          size = "506, 135";
+          position = "1312, -776";
+          halign = "left";
+          valign = "top";
 
-          # Цвета Rosé Pine
-          outer_color = "rgb(31748f)"; # pine
-          inner_color = "rgb(1f1d2e)"; # surface
-          font_color = "rgb(e0def4)";  # text
+          outer_color = "rgb(31748f) rgb(c4a7e7) rgb(9ccfd8) 45deg";
+          inner_color = "rgba(31, 29, 46, 0.75)";
+          font_color = "rgb(e0def4)";
 
-          # Цвета состояний
-          check_color = "rgb(f6c177)"; # gold
-          fail_color = "rgb(eb6f92)";  # love
+          check_color = "rgb(f6c177)";
+          fail_color = "rgb(eb6f92)";
 
-          rounding = 20;
-          outline_thickness = 2;
+          rounding = 67;
+          outline_thickness = 3;
 
-          # Строгий текст без курсива
+          font_family = "Nasalization";
           placeholder_text = "Password";
           fail_text = "Неверный пароль";
 
@@ -55,29 +70,50 @@
         }
       ];
 
-      # === Текстовые элементы ===
       label = [
-        # 1. Часы
+        # Буквы N A S A внутри 4 крайних кружков ряда
+        { text = "N"; font_size = 64; font_family = "Nasalization"; color = "rgb(e0def4)"; position = "1269, -120"; halign = "left"; valign = "top"; }
+        { text = "A"; font_size = 64; font_family = "Nasalization"; color = "rgb(e0def4)"; position = "1418, -120"; halign = "left"; valign = "top"; }
+        { text = "S"; font_size = 64; font_family = "Nasalization"; color = "rgb(e0def4)"; position = "1564, -124"; halign = "left"; valign = "top"; }
+        { text = "A"; font_size = 64; font_family = "Nasalization"; color = "rgb(e0def4)"; position = "1706, -120"; halign = "left"; valign = "top"; }
+
+        # Значки power/reboot (только визуал, не кликабельны)
+        { text = "⏻"; font_size = 40; font_family = "JetBrainsMono Nerd Font"; color = "rgb(9ccfd8)"; position = "50, -736"; halign = "left"; valign = "top"; }
+        { text = "⟲"; font_size = 40; font_family = "JetBrainsMono Nerd Font"; color = "rgb(9ccfd8)"; position = "50, -881"; halign = "left"; valign = "top"; }
+
+        # Часы — крупно, верх-лево
         {
           text = "cmd[update:1000] echo \"<b>$(date +'%H:%M')</b>\"";
-          font_size = 110;
-          font_family = "JetBrainsMono Nerd Font";
-          color = "rgb(e0def4)"; # text
-          position = "0, 200";
-          halign = "center";
-          valign = "center";
+          font_size = 130;
+          font_family = "Nasalization";
+          color = "rgb(e0def4)";
+          position = "78, -76";
+          halign = "left";
+          valign = "top";
           shadow_passes = 3;
           shadow_size = 4;
         }
-        # 2. Дата
+        # SUNDAY — день недели, под часами
         {
-          text = "cmd[update:1000] echo \"$(date +'%A, %d %B')\"";
-          font_size = 22;
-          font_family = "JetBrainsMono Nerd Font";
-          color = "rgb(c4a7e7)"; # iris
-          position = "0, 80";
-          halign = "center";
-          valign = "center";
+          text = "cmd[update:1000] echo \"$(LC_TIME=en_US.UTF-8 date +'%A' | tr 'a-z' 'A-Z')\"";
+          font_size = 90;
+          font_family = "Nasalization";
+          color = "rgb(9ccfd8)";
+          position = "447, -373";
+          halign = "left";
+          valign = "top";
+          shadow_passes = 2;
+          shadow_size = 3;
+        }
+        # 12 July — дата, центр экрана
+        {
+          text = "cmd[update:1000] echo \"$(LC_TIME=en_US.UTF-8 date +'%d %B')\"";
+          font_size = 60;
+          font_family = "Nasalization";
+          color = "rgb(c4a7e7)";
+          position = "903, -604";
+          halign = "left";
+          valign = "top";
           shadow_passes = 1;
         }
       ];

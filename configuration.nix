@@ -12,6 +12,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.configurationLimit = 1;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "amdgpu.abmlevel=0" ];
   boot.kernelModules = [
     "mt7921e"
     "tun"
@@ -38,6 +39,14 @@
       pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
+
+    config = {
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+        "org.freedesktop.impl.portal.Settings" = [ "gtk" ];
+      };
+    };
   };
 
   security.pam.services.hyprlock = {};   # без этого hyprlock не сможет проверять пароль
@@ -105,6 +114,7 @@
 
   time.timeZone = "Asia/Krasnoyarsk";
   i18n.defaultLocale = "ru_RU.UTF-8";
+  i18n.supportedLocales = [ "ru_RU.UTF-8/UTF-8" "en_US.UTF-8/UTF-8" ];
 
   ##############################################################
   # Печать, файловые сервисы, шрифты
@@ -166,8 +176,12 @@
     pavucontrol
     polkit_gnome
     waypaper
-    mpvpaper
+    gamescope
   ];
+
+
+  services.scx.enable = true; # Включает системную службу для eBPF планировщиков
+  services.scx.scheduler = "scx_lavd"; # Указывает нужный планировщик (по умолчанию используется scx_rustland)
 
   ##############################################################
   # dconf — нужен для тем GTK/иконок/курсора и настроек Nautilus

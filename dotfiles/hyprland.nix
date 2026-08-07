@@ -15,11 +15,10 @@
 
       "exec-once" = [
         "waypaper --restore"
-        "sleep 2 && hyprlock"
+        "hyprlock"
         "blueman-applet"
         "nm-applet --indicator"
         "waybar"
-        "clipse -listen"
         "wl-paste --type text --watch clipsy store"
         "wl-paste --type image --watch clipsy store"
       ];
@@ -32,6 +31,7 @@
         "col.inactive_border" = "rgba(1a1a1aaa)";
         layout = "dwindle";
       };
+
 
       decoration = {
         rounding = 10;
