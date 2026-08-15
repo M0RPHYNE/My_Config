@@ -4,18 +4,28 @@
   imports = [
     ./hardware-configuration.nix
     <home-manager/nixos>
+    /home/morphyne/Applications/Happ/module.nix
   ];
+
   ##############################################################
   # Загрузчик и ядро
   ##############################################################
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.grub.enable = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.efiInstallAsRemovable = false;
+  boot.loader.grub.device = "nodev";
+  boot.loader.efi.efiSysMountPoint = "/boot";
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.configurationLimit = 1;
+  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.configurationLimit = 5;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
   boot.kernelParams = [ "amdgpu.abmlevel=0" ];
   boot.kernelModules = [
     "mt7921e"
     "tun"
+    "acpi_call"
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -111,6 +121,7 @@
   ##############################################################
   networking.hostName = "morphyne";
   networking.networkmanager.enable = true;
+  networking.nftables.enable = true;
 
   time.timeZone = "Asia/Krasnoyarsk";
   i18n.defaultLocale = "ru_RU.UTF-8";
@@ -140,6 +151,7 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users.morphyne = import ./home.nix;
+
 
   ##############################################################
   # Пользователь
@@ -177,7 +189,11 @@
     polkit_gnome
     waypaper
     gamescope
+    unrar
   ];
+
+  nixpkgs.overlays = [ (import /home/morphyne/Applications/Happ/overlay.nix) ];
+  services.happ.enable = true;
 
 
   services.scx.enable = true; # Включает системную службу для eBPF планировщиков
@@ -242,6 +258,7 @@
     wayland
     dconf
     libglvnd
+    e2fsprogs
   ];
 
   system.stateVersion = "25.11"; # Did you read the comment?

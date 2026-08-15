@@ -19,8 +19,6 @@
       layer = "overlay";
       anchor = "top-right";
 
-      # группировка одинаковых уведомлений (например спам от Steam/Discord)
-      group-by = "app-name";
       max-visible = 5;
       sort = "-time";
 

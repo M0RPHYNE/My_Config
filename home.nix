@@ -14,6 +14,7 @@
     ./dotfiles/fastfetch.nix
     ./dotfiles/nautilus.nix
     ./dotfiles/battery.nix
+    ./dotfiles/hyprlock-widgets.nix
   ];
 
   home.file.".local/share/fonts/AstroSpace.otf".source = ./fonts/AstroSpace.otf;
@@ -50,6 +51,7 @@
     nixd
     zed-editor
     mpvpaper
+    termius
   ];
 
   ##############################################################
@@ -68,56 +70,6 @@
       position = "top-left";
     };
   };
-
-  ##############################################################
-  # SwayOSD и стили
-  ##############################################################
-  services.swayosd = {
-    enable = true;
-    topMargin = 0.85;  # 0.0 = у самого верха, 0.5 = центр экрана
-    stylePath = "${config.xdg.configHome}/swayosd/style.css";
-  };
-
-  xdg.configFile."swayosd/style.css".text = ''
-    window#osd {
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background-color: rgba(30, 30, 46, 0.95);
-    }
-
-    window#osd #container {
-      margin: 16px;
-    }
-
-    window#osd image,
-    window#osd label {
-      color: #e0def4;
-    }
-
-    window#osd progressbar,
-    window#osd segmentedprogress {
-      min-height: 6px;
-      border-radius: 999px;
-      background: transparent;
-      border: none;
-    }
-
-    window#osd trough,
-    window#osd segment {
-      min-height: inherit;
-      border-radius: inherit;
-      border: none;
-      background-color: rgba(224, 222, 244, 0.15);
-    }
-
-    window#osd progress,
-    window#osd segment.active {
-      min-height: inherit;
-      border-radius: inherit;
-      border: none;
-      background-color: #9ccfd8;
-    }
-  '';
 
   ##############################################################
   # Переменные окружения сессии

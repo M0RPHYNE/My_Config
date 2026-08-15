@@ -44,7 +44,7 @@
           rewrite = {
             "" = "Hyprland";          # Если окна нет
             "kitty" = "Kitty";
-            "firefox-nightly" = "Firefox";
+            "firefox-nightly" = "Nightly";
             "firefox" = "Firefox";
             "discord" = "Discord";
             "dev.zed.Zed" = "Zed Editor";
@@ -53,6 +53,7 @@
             "net.lutris.Lutris" = "Lutris";
             ".blueman-manager-wrapped" = "Bluetooth";
             "org.telegram.desktop" = "Telegram";
+            "md.Obsidian" = "Obsidian";
             "waypaper" = "Waypaper";
           };
         };

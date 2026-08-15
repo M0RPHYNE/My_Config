@@ -66,22 +66,23 @@
     ];
 
     bindel = [
-      ",XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise"
-      ",XF86AudioLowerVolume, exec, swayosd-client --output-volume lower"
+          ",XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.2 @DEFAULT_AUDIO_SINK@ 5%+"
+          ",XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
 
-      ",XF86MonBrightnessUp, exec, swayosd-client --brightness raise"
-      ",XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
+          ",XF86MonBrightnessUp, exec, brightnessctl set +5%"
+          ",XF86MonBrightnessDown, exec, brightnessctl set 5%-"
 
-      ",XF86AudioPlay, exec, playerctl play-pause && swayosd-client --play-pause"
-      ",XF86AudioPause, exec, playerctl play-pause && swayosd-client --play-pause"
-      ",XF86AudioNext, exec, playerctl next && swayosd-client --skip-next"
-      ",XF86AudioPrev, exec, playerctl previous && swayosd-client --skip-prev"
-    ];
+          ",XF86AudioPlay, exec, playerctl play-pause"
+          ",XF86AudioPause, exec, playerctl play-pause"
+          ",XF86AudioNext, exec, playerctl next"
+          ",XF86AudioPrev, exec, playerctl previous"
+          "$mainMod, XF86Launch1, dpms, toggle"
+        ];
 
-    bindl = [
-      ",XF86AudioMute, exec, swayosd-client --output-volume mute-toggle"
-      ",XF86AudioMicMute, exec, swayosd-client --default-source mute-toggle"
-    ];
+        bindl = [
+          ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          ",XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        ];
 
   };
 }

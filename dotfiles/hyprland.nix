@@ -21,6 +21,7 @@
         "waybar"
         "wl-paste --type text --watch clipsy store"
         "wl-paste --type image --watch clipsy store"
+        "swayosd-server"
       ];
 
       general = {
