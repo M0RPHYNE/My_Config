@@ -15,7 +15,6 @@
 
       "exec-once" = [
         "waypaper --restore"
-        "hyprlock"
         "blueman-applet"
         "nm-applet --indicator"
         "waybar"

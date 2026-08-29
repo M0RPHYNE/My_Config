@@ -5,6 +5,7 @@
     ./hardware-configuration.nix
     <home-manager/nixos>
     /home/morphyne/Applications/Happ/module.nix
+    ./dotfiles/silent-sddm.nix
   ];
 
   ##############################################################
@@ -36,7 +37,7 @@
   ##############################################################
   # Сессия — автологин в tty + запуск через UWSM
   ##############################################################
-  services.getty.autologinUser = "morphyne";
+  #services.getty.autologinUser = "morphyne";
 
   programs.hyprland = {
     enable = true;
