@@ -14,8 +14,6 @@
     ./dotfiles/fastfetch.nix
     ./dotfiles/nautilus.nix
     ./dotfiles/battery.nix
-    ./dotfiles/hyprtoolkit.nix
-    #.dotfiles/hyprqt6engine.nix
   ];
 
   home.file.".local/share/fonts/AstroSpace.otf".source = ./fonts/AstroSpace.otf;

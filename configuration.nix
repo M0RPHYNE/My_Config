@@ -23,11 +23,11 @@ in
   boot.loader.efi.efiSysMountPoint = "/boot";
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.useOSProber = true;
-  boot.loader.grub.configurationLimit = 5;
+  boot.loader.grub.configurationLimit = 10;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "amdgpu.abmlevel=0" ];
   boot.kernelModules = [
-    "mt7921e"
+  #  "mt7921e"
     "tun"
   ];
 
