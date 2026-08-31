@@ -1,17 +1,21 @@
 { config, lib, pkgs, ... }:
 
+let
+  unstable = import <nixos-unstable> {
+    config = config.nixpkgs.config;
+  };
+in
+
 {
   imports = [
     ./hardware-configuration.nix
-    <home-manager/nixos>
-    /home/morphyne/Applications/Happ/module.nix
     ./dotfiles/silent-sddm.nix
+    <home-manager/nixos>
   ];
 
   ##############################################################
   # Загрузчик и ядро
   ##############################################################
-  boot.loader.systemd-boot.enable = false;
   boot.loader.grub.enable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.efiInstallAsRemovable = false;
@@ -21,23 +25,16 @@
   boot.loader.grub.useOSProber = true;
   boot.loader.grub.configurationLimit = 5;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
   boot.kernelParams = [ "amdgpu.abmlevel=0" ];
   boot.kernelModules = [
     "mt7921e"
     "tun"
-    "acpi_call"
   ];
 
   nixpkgs.config.allowUnfree = true;
   hardware.enableAllFirmware = true;
 
   networking.firewall.enable = false;
-
-  ##############################################################
-  # Сессия — автологин в tty + запуск через UWSM
-  ##############################################################
-  #services.getty.autologinUser = "morphyne";
 
   programs.hyprland = {
     enable = true;
@@ -50,31 +47,15 @@
       pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
-
     config = {
+      common.default = [ "gtk" ];
       hyprland = {
         default = [ "hyprland" "gtk" ];
-        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Settings" = [ "gtk" ];
       };
     };
   };
 
   security.pam.services.hyprlock = {};   # без этого hyprlock не сможет проверять пароль
-
-  systemd.user.services.polkit-gnome-authentication-agent-1 = {
-      description = "polkit-gnome-authentication-agent-1";
-      wantedBy = [ "graphical-session.target" ];
-      wants = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        Restart = "on-failure";
-        RestartSec = 1;
-        TimeoutStopSec = 10;
-      };
-    };
 
   ##############################################################
   # Оборудование — Bluetooth, графика, звук
@@ -152,7 +133,9 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users.morphyne = import ./home.nix;
-
+  home-manager.extraSpecialArgs = {
+    inherit unstable;
+  };
 
   ##############################################################
   # Пользователь
@@ -187,14 +170,15 @@
     mission-center
     lm_sensors
     pavucontrol
-    polkit_gnome
     waypaper
     gamescope
-    unrar
+    wineWow64Packages.stable
+    winetricks
+    _7zz
   ];
 
-  nixpkgs.overlays = [ (import /home/morphyne/Applications/Happ/overlay.nix) ];
-  services.happ.enable = true;
+  #nixpkgs.overlays = [ (import /home/morphyne/Applications/Happ/overlay.nix) ];
+  #services.happ.enable = true;
 
 
   services.scx.enable = true; # Включает системную службу для eBPF планировщиков

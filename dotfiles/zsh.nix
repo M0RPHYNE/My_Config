@@ -26,18 +26,13 @@
       setopt AUTO_CD
       setopt EXTENDED_GLOB
       export PATH="$HOME/.local/bin:$PATH"
-
       if (( COLUMNS >= 103 && LINES >= 22 )); then
         fastfetch
       fi
-    '';
 
-    # Автозапуск Hyprland через UWSM сразу после автологина в tty
-    # (замена SDDM — см. предыдущий шаг с getty.autologinUser)
-    profileExtra = ''
-      if uwsm check may-start; then
-        exec uwsm start hyprland-uwsm.desktop
-      fi
+      extract() {
+        7zz x "$1" -o"''${1%.*}"
+      }
     '';
   };
 }
