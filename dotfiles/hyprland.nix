@@ -54,6 +54,25 @@
       windowrule = match:class ^(dev\.morphyne\.clipsy)$, float on
       windowrule = match:class ^(dev\.morphyne\.clipsy)$, size 420 560
       windowrule = match:class ^(dev\.morphyne\.clipsy)$, pin on
+
+      # PiP в Firefox Nightly — плавающее окно в правом верхнем углу
+      windowrule = match:class ^(firefox-nightly)$, match:title ^(Картинка в картинке)$, float on
+      windowrule = match:class ^(firefox-nightly)$, match:title ^(Картинка в картинке)$, keep_aspect_ratio on
+      windowrule = match:class ^(firefox-nightly)$, match:title ^(Картинка в картинке)$, size 480 270
+      windowrule = match:class ^(firefox-nightly)$, match:title ^(Картинка в картинке)$, move 72% 7%
+      windowrule = match:class ^(firefox-nightly)$, match:title ^(Картинка в картинке)$, pin on
+
+      # GNOME Часы — плавающее окно по центру
+      windowrule = match:class ^(org\.gnome\.clocks)$, float on
+      windowrule = match:class ^(org\.gnome\.clocks)$, size 500 600
+      windowrule = match:class ^(org\.gnome\.clocks)$, center on
+
+      # GNOME Часы — плавающее окно по центру
+      windowrule = match:class ^(org\.gnome\.Calculator)$, float on
+      windowrule = match:class ^(org\.gnome\.Calculator)$, size 500 600
+      windowrule = match:class ^(org\.gnome\.Calculator)$, center on
+
+
     '';
   };
 }

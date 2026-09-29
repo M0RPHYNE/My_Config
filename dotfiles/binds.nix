@@ -22,7 +22,7 @@
       "$mainMod, V, exec, clipsy"
 
       "ALT, 1, exec, firefox"
-      "ALT, 2, exec, flclash"
+      "ALT, 2, exec, happ"
 
 
 

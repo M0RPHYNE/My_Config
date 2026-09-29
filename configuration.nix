@@ -9,6 +9,7 @@ in
 {
   imports = [
     ./hardware-configuration.nix
+    ./dotfiles/nix-ld.nix
     ./dotfiles/silent-sddm.nix
     <home-manager/nixos>
   ];
@@ -16,55 +17,48 @@ in
   ##############################################################
   # Загрузчик и ядро
   ##############################################################
-  boot.loader.grub.enable = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.efiInstallAsRemovable = false;
-  boot.loader.grub.device = "nodev";
-  boot.loader.efi.efiSysMountPoint = "/boot";
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.grub.useOSProber = true;
-  boot.loader.grub.configurationLimit = 10;
+  boot.loader.grub = {
+    enable = true;
+    efiSupport = true;
+    efiInstallAsRemovable = false;
+    device = "nodev";
+    useOSProber = true;
+    configurationLimit = 10;
+  };
+  boot.loader.efi = {
+    efiSysMountPoint = "/boot";
+    canTouchEfiVariables = true;
+  };
+
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "amdgpu.abmlevel=0" ];
   boot.kernelModules = [
-  #  "mt7921e"
+    "mt7921e"
     "tun"
   ];
-
-  nixpkgs.config.allowUnfree = true;
-  hardware.enableAllFirmware = true;
-
-  networking.firewall.enable = false;
-
-  programs.hyprland = {
-    enable = true;
-    withUWSM = true;
-  };
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
-      pkgs.xdg-desktop-portal-gtk
-    ];
-    config = {
-      common.default = [ "gtk" ];
-      hyprland = {
-        default = [ "hyprland" "gtk" ];
-      };
-    };
-  };
-
-  security.pam.services.hyprlock = {};   # без этого hyprlock не сможет проверять пароль
+  boot.extraModprobeConfig = ''
+    options cfg80211 ieee80211_regdom=RU
+    options mt7921e disable_aspm=1
+  '';
 
   ##############################################################
-  # Оборудование — Bluetooth, графика, звук
+  # Система
+  ##############################################################
+  nixpkgs.config.allowUnfree = true;
+  hardware.enableAllFirmware = true;
+  hardware.wirelessRegulatoryDatabase = true;
+  networking.firewall.enable = false;
+
+  system.stateVersion = "25.11";
+
+  ##############################################################
+  # Оборудование — Bluetooth, графика, звук, питание
   ##############################################################
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
-  services.blueman.enable = true;   # сам добавляет pkgs.blueman + D-Bus регистрацию
+  services.blueman.enable = true;
 
   hardware.graphics = {
     enable = true;
@@ -77,12 +71,20 @@ in
     pulse.enable = true;
     wireplumber.enable = true;
   };
-  security.rtkit.enable = true;   # реалтайм-планирование для pipewire, без него звук может подрагивать
+  security.rtkit.enable = true;
 
   services.power-profiles-daemon.enable = true;
 
   ##############################################################
-  # Память — zram в приоритете, файл подкачки как подстраховка
+  # Планировщик
+  ##############################################################
+  services.scx = {
+    enable = true;
+    scheduler = "scx_lavd";
+  };
+
+  ##############################################################
+  # Память — zram, файл подкачки
   ##############################################################
   zramSwap = {
     enable = true;
@@ -102,18 +104,48 @@ in
   # Сеть, время, локаль
   ##############################################################
   networking.hostName = "morphyne";
-  networking.networkmanager.enable = true;
-  networking.nftables.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    wifi.powersave = false;
+  };
 
   time.timeZone = "Asia/Krasnoyarsk";
   i18n.defaultLocale = "ru_RU.UTF-8";
-  i18n.supportedLocales = [ "ru_RU.UTF-8/UTF-8" "en_US.UTF-8/UTF-8" ];
+  i18n.supportedLocales = [
+    "ru_RU.UTF-8/UTF-8"
+    "en_US.UTF-8/UTF-8"
+  ];
 
   ##############################################################
-  # Печать, файловые сервисы, шрифты
+  # Hyprland, порталы и экран блокировки
+  ##############################################################
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-hyprland
+    ];
+    config = {
+      common.default = [ "gtk" ];
+      hyprland.default = [ "hyprland" "gtk" ];
+    };
+  };
+
+  security.pam.services.hyprlock = {};
+
+  programs.dconf.enable = true;
+
+  ##############################################################
+  # Печать, файловые сервисы, шрифты, Flatpak
   ##############################################################
   services.printing.enable = true;
   services.gvfs.enable = true;
+  services.flatpak.enable = true;
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
@@ -123,128 +155,98 @@ in
   ];
 
   ##############################################################
-  # Flatpak
+  # Steam / игры
   ##############################################################
-  services.flatpak.enable = true;
+  programs.steam.enable = true;
 
   ##############################################################
-  # Home Manager
-  ##############################################################
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.users.morphyne = import ./home.nix;
-  home-manager.extraSpecialArgs = {
-    inherit unstable;
-  };
-
-  ##############################################################
-  # Пользователь
+  # Пользователь и оболочка
   ##############################################################
   users.users.morphyne = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
   programs.zsh.enable = true;
 
   ##############################################################
+  # Home Manager
+  ##############################################################
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.morphyne = import ./home.nix;
+    extraSpecialArgs = {
+      inherit unstable;
+    };
+  };
+
+  ##############################################################
   # Системные пакеты
   ##############################################################
-
   environment.systemPackages = with pkgs; [
-    wget
-    git
-    util-linux
-    pciutils
-    usbutils
-    networkmanagerapplet
-    acpi
-    qbittorrent
-    lutris
-    steam-run
+    # --- Базовые утилиты ---
+    _7zz
     file
-    strace
+    git
     unzip
-    mangohud
+    wget
+
+    # --- Диагностика и железо ---
+    acpi
     btop
-    mission-center
     lm_sensors
+    pciutils
+    strace
+    usbutils
+    util-linux
+
+    # --- Сеть ---
+    iw
+    networkmanagerapplet
+
+    # --- Звук и обои ---
     pavucontrol
     waypaper
+
+    # --- Игры и Wine ---
     gamescope
-    wineWow64Packages.stable
+    mangohud
+    steam-run
     winetricks
-    _7zz
+    wineWow64Packages.stable
   ];
 
-  #nixpkgs.overlays = [ (import /home/morphyne/Applications/Happ/overlay.nix) ];
-  #services.happ.enable = true;
-
-
-  services.scx.enable = true; # Включает системную службу для eBPF планировщиков
-  services.scx.scheduler = "scx_lavd"; # Указывает нужный планировщик (по умолчанию используется scx_rustland)
-
   ##############################################################
-  # dconf — нужен для тем GTK/иконок/курсора и настроек Nautilus
+  # Сервис Happ
   ##############################################################
-  programs.dconf.enable = true;
+  systemd.services.happd = {
+    description = "Happ Process Control Daemon";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
 
-  ##############################################################
-  # Steam / игры / совместимость бинарников
-  ##############################################################
-  programs.steam.enable = true;
+    serviceConfig = {
+      Type = "simple";
+      User = "root";
+      Group = "root";
 
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = with pkgs; [
-    stdenv.cc.cc.lib
-    zlib
-    nss
-    nspr
-    dbus
-    at-spi2-atk
-    at-spi2-core
-    cups
-    expat
-    fontconfig
-    freetype
-    glib
-    gtk3
-    pango
-    cairo
-    alsa-lib
-    libdrm
-    mesa
-    libGL
-    libxkbcommon
-    libx11
-    libxcomposite
-    libxdamage
-    libxext
-    libxfixes
-    libxrandr
-    libxcb
-    libxi
-    libxtst
-    libxcursor
-    libxscrnsaver
-    libxshmfence
-    udev
-    libgbm
-    libepoxy
-    libayatana-appindicator
-    keybinder3
-    harfbuzz
-    gdk-pixbuf
-    libayatana-indicator
-    ayatana-ido
-    libdbusmenu
-    ffmpeg
-    libpulseaudio
-    wayland
-    dconf
-    libglvnd
-    e2fsprogs
-  ];
+      # В NixOS нельзя использовать /bin/happd — указываем реальный путь
+      ExecStart = "/home/morphyne/Applications/Happ/opt/happ/bin/happd";
 
-  system.stateVersion = "25.11"; # Did you read the comment?
+      # Демон специально завершается с кодом 0 при подключении обновлённого клиента,
+      # поэтому используем always, а не on-failure
+      Restart = "always";
+      RestartSec = "5s";
+
+      # Демону требуются привилегии для запуска sing-box с TUN
+      NoNewPrivileges = false;
+
+      TimeoutStopSec = "10s";
+      KillMode = "mixed";
+      KillSignal = "SIGTERM";
+    };
+  };
 }
